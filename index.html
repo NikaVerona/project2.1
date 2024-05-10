@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Мониторинг расходов</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <img src="logo.png" alt="Логотип компании" />
+    </header>
+    <main>
+      <div id="balance-container">
+        <label for="balance">Сумма на месяц:</label>
+        <input type="number" id="balance" min="0" placeholder="Введите сумму" />
+      </div>
+      <div id="income-expense-container">
+        <div id="income">
+          <h2>Доходы</h2>
+          <ul id="income-list"></ul>
+          <button id="add-income">Добавить доход</button>
+        </div>
+        <div id="expense">
+          <h2>Расходы</h2>
+          <ul id="expense-list"></ul>
+          <button id="add-expense">Добавить расход</button>
+        </div>
+      </div>
+      <div id="balance-message"></div>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
