@@ -16,31 +16,31 @@ document.addEventListener("DOMContentLoaded", function () {
   function updateBalanceMessage() {
     const difference = incomeTotal - expenseTotal;
     if (difference > 0) {
-      balanceMessage.textContent = `Вы все еще можете потратить ${difference.toFixed(
+      balanceMessage.textContent = `You can still spend ${difference.toFixed(
         2
-      )} злотых`;
+      )} PLN`;
     } else if (difference === 0) {
-      balanceMessage.textContent = "Баланс равен нулю";
+      balanceMessage.textContent = "Balance is zero";
     } else {
-      balanceMessage.textContent = `Баланс отрицательный. Вы потеряли ${Math.abs(
+      balanceMessage.textContent = `The balance is negative. You lost ${Math.abs(
         difference
-      ).toFixed(2)} злотых`;
+      ).toFixed(2)} PLN`;
     }
   }
 
   function addTransactionToList(list, amount, description) {
     const item = document.createElement("li");
-    item.textContent = `${description}: ${amount.toFixed(2)} злотых`;
+    item.textContent = `${description}: ${amount.toFixed(2)} PLN`;
 
     const editButton = document.createElement("button");
-    editButton.textContent = "Редактировать";
+    editButton.textContent = "Edit";
     editButton.addEventListener("click", function () {
-      const newAmount = prompt("Введите новую сумму:");
+      const newAmount = prompt("Enter new amount:");
       if (newAmount !== null) {
         const parsedAmount = parseFloat(newAmount);
         if (!isNaN(parsedAmount)) {
           amount = parsedAmount;
-          item.textContent = `${description}: ${amount.toFixed(2)} злотых`;
+          item.textContent = `${description}: ${amount.toFixed(2)} PLN`;
           if (list === incomeList) {
             incomeTotal += parsedAmount;
           } else {
@@ -48,13 +48,13 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           updateBalanceMessage();
         } else {
-          alert("Неверный формат суммы!");
+          alert("Invalid amount format!");
         }
       }
     });
 
     const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Удалить";
+    deleteButton.textContent = "Delete";
     deleteButton.addEventListener("click", function () {
       if (list === incomeList) {
         incomeTotal -= amount;
@@ -71,29 +71,29 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.getElementById("add-income").addEventListener("click", function () {
-    const amount = prompt("Введите сумму дохода:");
+    const amount = prompt("Enter the amount of income:");
     if (amount !== null) {
       const parsedAmount = parseFloat(amount);
       if (!isNaN(parsedAmount)) {
-        addTransactionToList(incomeList, parsedAmount, "Доход");
+        addTransactionToList(incomeList, parsedAmount, "Income");
         incomeTotal += parsedAmount;
         updateBalanceMessage();
       } else {
-        alert("Неверный формат суммы!");
+        alert("Invalid amount format!");
       }
     }
   });
 
   document.getElementById("add-expense").addEventListener("click", function () {
-    const amount = prompt("Введите сумму расхода:");
+    const amount = prompt("Enter the expense amount:");
     if (amount !== null) {
       const parsedAmount = parseFloat(amount);
       if (!isNaN(parsedAmount)) {
-        addTransactionToList(expenseList, parsedAmount, "Расход");
+        addTransactionToList(expenseList, parsedAmount, "Outcome");
         expenseTotal += parsedAmount;
         updateBalanceMessage();
       } else {
-        alert("Неверный формат суммы!");
+        alert("Invalid amount format!");
       }
     }
   });

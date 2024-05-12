@@ -20,6 +20,7 @@ main {
 
 #balance-container {
   margin-bottom: 20px;
+  text-align: center;
 }
 
 #balance-container label {
