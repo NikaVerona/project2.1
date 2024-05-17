@@ -1,100 +1,163 @@
+const Movement = {
+  id: "",
+  description: "",
+  amount: 0,
+  category: "",
+};
+const movements = [];
+idEdit = "";
+
 document.addEventListener("DOMContentLoaded", function () {
-  const balanceInput = document.getElementById("balance");
-  const incomeList = document.getElementById("income-list");
-  const expenseList = document.getElementById("expense-list");
-  const balanceMessage = document.getElementById("balance-message");
+  const inBtn = document.getElementById("btnAdd");
+  const outBtn = document.getElementById("btnRest");
 
-  let balance = 0;
-  let incomeTotal = 0;
-  let expenseTotal = 0;
-
-  balanceInput.addEventListener("change", function () {
-    balance = parseFloat(balanceInput.value);
-    updateBalanceMessage();
+  outBtn.addEventListener("click", function () {
+    saveMov("Outcome");
+  });
+  inBtn.addEventListener("click", function () {
+    saveMov("Income");
   });
 
-  function updateBalanceMessage() {
-    const difference = incomeTotal - expenseTotal;
-    if (difference > 0) {
-      balanceMessage.textContent = `You can still spend ${difference.toFixed(
-        2
-      )} PLN`;
-    } else if (difference === 0) {
-      balanceMessage.textContent = "Balance is zero";
+  function saveMov(category) {
+    if (idEdit != "") {
+      modifyRow();
     } else {
-      balanceMessage.textContent = `The balance is negative. You lost ${Math.abs(
-        difference
-      ).toFixed(2)} PLN`;
+      addRow(category);
     }
   }
-
-  function addTransactionToList(list, amount, description) {
-    const item = document.createElement("li");
-    item.textContent = `${description}: ${amount.toFixed(2)} PLN`;
-
-    const editButton = document.createElement("button");
-    editButton.textContent = "Edit";
-    editButton.addEventListener("click", function () {
-      const newAmount = prompt("Enter new amount:");
-      if (newAmount !== null) {
-        const parsedAmount = parseFloat(newAmount);
-        if (!isNaN(parsedAmount)) {
-          amount = parsedAmount;
-          item.textContent = `${description}: ${amount.toFixed(2)} PLN`;
-          if (list === incomeList) {
-            incomeTotal += parsedAmount;
-          } else {
-            expenseTotal += parsedAmount;
-          }
-          updateBalanceMessage();
-        } else {
-          alert("Invalid amount format!");
-        }
-      }
-    });
-
-    const deleteButton = document.createElement("button");
-    deleteButton.textContent = "Delete";
-    deleteButton.addEventListener("click", function () {
-      if (list === incomeList) {
-        incomeTotal -= amount;
-      } else {
-        expenseTotal -= amount;
-      }
-      list.removeChild(item);
-      updateBalanceMessage();
-    });
-
-    item.appendChild(editButton);
-    item.appendChild(deleteButton);
-    list.appendChild(item);
-  }
-
-  document.getElementById("add-income").addEventListener("click", function () {
-    const amount = prompt("Enter the amount of income:");
-    if (amount !== null) {
-      const parsedAmount = parseFloat(amount);
-      if (!isNaN(parsedAmount)) {
-        addTransactionToList(incomeList, parsedAmount, "Income");
-        incomeTotal += parsedAmount;
-        updateBalanceMessage();
-      } else {
-        alert("Invalid amount format!");
-      }
-    }
-  });
-
-  document.getElementById("add-expense").addEventListener("click", function () {
-    const amount = prompt("Enter the expense amount:");
-    if (amount !== null) {
-      const parsedAmount = parseFloat(amount);
-      if (!isNaN(parsedAmount)) {
-        addTransactionToList(expenseList, parsedAmount, "Outcome");
-        expenseTotal += parsedAmount;
-        updateBalanceMessage();
-      } else {
-        alert("Invalid amount format!");
-      }
-    }
-  });
 });
+
+function addRow(category) {
+  const txtDescription = document.getElementById(`txt${category}Description`);
+  const txtAmount = document.getElementById(`txt${category}Value`);
+
+  const mov = Object.create(Movement);
+  mov.description = txtDescription.value;
+  mov.amount = txtAmount.value;
+  mov.id = Date.now();
+  mov.category = category;
+  movements.push(mov);
+  refreshTable(category);
+  emptyValues(category);
+  totalHeader();
+}
+function emptyValues(category) {
+  const txtDescription = document.getElementById(`txt${category}Description`);
+  const txtAmount = document.getElementById(`txt${category}Value`);
+
+  txtDescription.value = "";
+  txtAmount.value = "";
+  idEdit = "";
+}
+function modifyRow() {
+  const mov = movements.find((movimiento) => movimiento.id === idEdit);
+  const txtDescription = document.getElementById(
+    `txt${mov.category}Description`
+  );
+  const txtAmount = document.getElementById(`txt${mov.category}Value`);
+
+  mov.description = txtDescription.value;
+  mov.amount = txtAmount.value;
+  refreshTable(mov.category);
+  emptyValues(mov.category);
+  totalHeader();
+}
+
+function editRow(id) {
+  const mov = movements.find((movimiento) => movimiento.id === id);
+
+  const txtDescription = document.getElementById(
+    `txt${mov.category}Description`
+  );
+  const txtAmount = document.getElementById(`txt${mov.category}Value`);
+
+  txtDescription.value = mov.description;
+  txtAmount.value = mov.amount;
+  idEdit = mov.id;
+}
+function deleteRow(id) {
+  const category = movements.find((mov) => mov.id === id).category;
+  const index = movements.findIndex((mov) => mov.id === id);
+  const confirmation = confirm(
+    "¿Are you sure that you want to delete the register?"
+  );
+
+  if (index !== -1 && confirmation) {
+    movements.splice(index, 1);
+    // console.log('Delete Movement');
+    refreshTable(category);
+    emptyValues(category);
+    totalHeader();
+  } else {
+    console.log("We cannot find any register with that ID");
+  }
+}
+
+function refreshTable(category) {
+  const tblValues = document.getElementById(`tbl${category}`);
+  const sumaSpan = document.getElementById(`Sum${category}`);
+
+  var total = 0;
+  tblValues.textContent = "";
+  sumaSpan.textContent = "";
+
+  movements
+    .filter((mov) => mov.category === category)
+    .forEach((mov) => {
+      total = total + parseFloat(mov.amount);
+      const newRow = document.createElement("tr");
+      const descriptionCell = document.createElement("td");
+      descriptionCell.textContent = mov.description;
+      const amountCell = document.createElement("td");
+      amountCell.textContent = mov.amount;
+      const actionsCell = document.createElement("td");
+      const editButton = document.createElement("button");
+      editButton.textContent = "Edit";
+      editButton.addEventListener("click", () => editRow(mov.id, category));
+
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", () => deleteRow(mov.id));
+
+      actionsCell.appendChild(editButton);
+      actionsCell.appendChild(deleteButton);
+
+      newRow.appendChild(descriptionCell);
+      newRow.appendChild(amountCell);
+      newRow.appendChild(actionsCell);
+      tblValues.appendChild(newRow);
+    });
+  sumaSpan.textContent = total;
+}
+function totalHeader() {
+  const pSum = document.getElementById(`balance-message`);
+  var totalSum = 0;
+  pSum.textContent = "";
+  var myClass = "";
+  movements.forEach((mov) => {
+    if (mov.category === "Income") {
+      totalSum = totalSum + parseFloat(mov.amount);
+    }
+    if (mov.category === "Outcome") {
+      totalSum = totalSum - parseFloat(mov.amount);
+    }
+  });
+  if (totalSum > 0) {
+    pSum.textContent = `You can still spend  ${totalSum.toFixed(2)} PLN`;
+    myClass = "green";
+  }
+  if (totalSum === 0) {
+    pSum.textContent = `Balance is zero`;
+  }
+  if (totalSum < 0) {
+    pSum.textContent = `The balance is negative. You lost ${Math.abs(
+      totalSum.toFixed(2)
+    )} PLN`;
+    myClass = "red";
+  }
+  pSum.classList.remove("red");
+  pSum.classList.remove("green");
+  if (myClass.length > 0) {
+    pSum.classList.add(myClass);
+  }
+}
